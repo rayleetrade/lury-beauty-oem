@@ -39,6 +39,22 @@ function verifySignature(payload: string, headers: Headers, secret: string) {
   });
 }
 
+function debugSignature(payload: string, headers: Headers, secret: string) {
+  const id = headers.get("webhook-id") || "";
+  const timestamp = headers.get("webhook-timestamp") || "";
+  const signature = headers.get("webhook-signature") || "";
+  const key = Buffer.from(secret.replace(/^whsec_/, ""), "base64");
+  const expected = crypto.createHmac("sha256", key).update(id + "." + timestamp + "." + payload).digest("base64");
+  return {
+    hasId: Boolean(id), hasTs: Boolean(timestamp), hasSig: Boolean(signature),
+    age: timestamp ? Math.round(Date.now() / 1000 - Number(timestamp)) : null,
+    keyLen: key.length, secretHead: secret.slice(0, 12),
+    payloadLen: payload.length, payloadHead: payload.slice(0, 40),
+    givenHead: signature.slice(0, 20), expectedHead: expected.slice(0, 20),
+    givenCount: signature.split(" ").length,
+  };
+}
+
 async function resend(path: string, key: string, init: RequestInit = {}) {
   const res = await fetch(`${RESEND_API}${path}`, {
     ...init,
@@ -78,7 +94,7 @@ export async function POST(request: Request) {
 
   const payload = await request.text();
   if (payload.length > 512 * 1024) return json({ error: "Payload too large" }, 413);
-  if (!verifySignature(payload, request.headers, secret)) return json({ error: "Invalid signature" }, 401);
+  if (!verifySignature(payload, request.headers, secret)) return json({ error: "Invalid signature", debug: debugSignature(payload, request.headers, secret) }, 401);
 
   let event: { type?: string; data?: { email_id?: string } };
   try { event = JSON.parse(payload); } catch { return json({ error: "Invalid JSON" }, 400); }
