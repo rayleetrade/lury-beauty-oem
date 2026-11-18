@@ -52,6 +52,7 @@ function debugSignature(payload: string, headers: Headers, secret: string) {
     payloadLen: payload.length, payloadHead: payload.slice(0, 40),
     givenHead: signature.slice(0, 20), expectedHead: expected.slice(0, 20),
     givenCount: signature.split(" ").length,
+    headerKeys: [...headers.keys()],
   };
 }
 
