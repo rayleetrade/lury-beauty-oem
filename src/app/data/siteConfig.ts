@@ -12,7 +12,7 @@ export const siteConfig = {
   whatsappDisplay: "+86 183 6665 6532",
   // Number that actually receives wa.me conversations.
   whatsappPhone: "8618366656532",
-  email: "2826347155@qq.com",
+  email: "info@lurybeauty.com",
   logo: "/images/logo/lury-beauty-oem-logo.png",
   logoMark: "/images/logo/lury-beauty-oem-mark.svg",
   favicon: "/images/logo/lury-beauty-oem-mark.svg",
