@@ -19,17 +19,26 @@ type Attachment = {
 const json = (data: object, status: number) =>
   Response.json(data, { status, headers: { "Cache-Control": "no-store" } });
 
+function header(headers: Headers, ...names: string[]) {
+  for (const name of names) {
+    const value = headers.get(name);
+    if (value) return value;
+  }
+  return null;
+}
+
+// Resend signs with Svix-compatible headers (svix-*), also exposed as webhook-*.
 function verifySignature(payload: string, headers: Headers, secret: string) {
-  const id = headers.get("webhook-id");
-  const timestamp = headers.get("webhook-timestamp");
-  const signature = headers.get("webhook-signature");
+  const id = header(headers, "svix-id", "webhook-id");
+  const timestamp = header(headers, "svix-timestamp", "webhook-timestamp");
+  const signature = header(headers, "svix-signature", "webhook-signature");
   if (!id || !timestamp || !signature) return false;
   const age = Math.abs(Date.now() / 1000 - Number(timestamp));
   if (!Number.isFinite(age) || age > TOLERANCE_SECONDS) return false;
   const key = Buffer.from(secret.replace(/^whsec_/, ""), "base64");
   const expected = crypto
     .createHmac("sha256", key)
-    .update(`${id}.${timestamp}.${payload}`)
+    .update(id + "." + timestamp + "." + payload)
     .digest();
   return signature.split(" ").some((part) => {
     const [version, value] = part.split(",");
@@ -37,23 +46,6 @@ function verifySignature(payload: string, headers: Headers, secret: string) {
     const given = Buffer.from(value, "base64");
     return given.length === expected.length && crypto.timingSafeEqual(given, expected);
   });
-}
-
-function debugSignature(payload: string, headers: Headers, secret: string) {
-  const id = headers.get("webhook-id") || "";
-  const timestamp = headers.get("webhook-timestamp") || "";
-  const signature = headers.get("webhook-signature") || "";
-  const key = Buffer.from(secret.replace(/^whsec_/, ""), "base64");
-  const expected = crypto.createHmac("sha256", key).update(id + "." + timestamp + "." + payload).digest("base64");
-  return {
-    hasId: Boolean(id), hasTs: Boolean(timestamp), hasSig: Boolean(signature),
-    age: timestamp ? Math.round(Date.now() / 1000 - Number(timestamp)) : null,
-    keyLen: key.length, secretHead: secret.slice(0, 12),
-    payloadLen: payload.length, payloadHead: payload.slice(0, 40),
-    givenHead: signature.slice(0, 20), expectedHead: expected.slice(0, 20),
-    givenCount: signature.split(" ").length,
-    headerKeys: [...headers.keys()],
-  };
 }
 
 async function resend(path: string, key: string, init: RequestInit = {}) {
@@ -95,7 +87,7 @@ export async function POST(request: Request) {
 
   const payload = await request.text();
   if (payload.length > 512 * 1024) return json({ error: "Payload too large" }, 413);
-  if (!verifySignature(payload, request.headers, secret)) return json({ error: "Invalid signature", debug: debugSignature(payload, request.headers, secret) }, 401);
+  if (!verifySignature(payload, request.headers, secret)) return json({ error: "Invalid signature" }, 401);
 
   let event: { type?: string; data?: { email_id?: string } };
   try { event = JSON.parse(payload); } catch { return json({ error: "Invalid JSON" }, 400); }
