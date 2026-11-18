@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Lury Beauty OEM brand mark</title>
+  <desc id="desc">A champagne and green LB lash monogram for Lury Beauty OEM.</desc>
+  <defs>
+    <linearGradient id="bg" x1="16" y1="10" x2="112" y2="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffdf8"/>
+      <stop offset="0.58" stop-color="#fff5eb"/>
+      <stop offset="1" stop-color="#efe3cf"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="20" y1="18" x2="110" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e8ca82"/>
+      <stop offset="0.5" stop-color="#c79a43"/>
+      <stop offset="1" stop-color="#f0d99b"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="118" height="118" rx="28" fill="url(#bg)"/>
+  <rect x="7.5" y="7.5" width="113" height="113" rx="25.5" fill="none" stroke="url(#gold)" stroke-width="5"/>
+  <path d="M30 75 C43 91 84 94 101 69" fill="none" stroke="#233818" stroke-width="6" stroke-linecap="round"/>
+  <path d="M42 75 L35 59 M54 80 L51 59 M67 81 L68 57 M80 79 L86 59 M91 73 L101 58" fill="none" stroke="#233818" stroke-width="4.5" stroke-linecap="round"/>
+  <text x="64" y="58" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="38" font-weight="700" letter-spacing="-2" fill="#233818">LB</text>
+  <path d="M92 34 C98 26 106 28 109 20 C110 29 105 36 96 38 C101 40 106 45 108 52 C99 51 93 45 92 34Z" fill="#d5aa4f" opacity="0.95"/>
+</svg>
