@@ -27,7 +27,18 @@ declare global {
   interface Window {
     dataLayer?: Record<string, unknown>[];
     gtag?: (...args: unknown[]) => void;
+    __luryGaQueue?: unknown[][];
   }
+}
+
+// gtag.js loads after hydration, so queue early events instead of dropping them.
+function gaSend(...args: unknown[]) {
+  if (typeof window === "undefined") return;
+  if (window.gtag) {
+    window.gtag(...args);
+    return;
+  }
+  (window.__luryGaQueue ||= []).push(args);
 }
 
 export function leadEvent(event: string, parameters: Record<string, string> = {}) {
@@ -36,12 +47,12 @@ export function leadEvent(event: string, parameters: Record<string, string> = {}
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({ event, ...payload });
   // GA4 direct (used when NEXT_PUBLIC_GA4_ID is configured).
-  window.gtag?.("event", event, payload);
+  gaSend("event", event, payload);
 }
 
 export function pageView(path: string) {
   if (typeof window === "undefined") return;
-  window.gtag?.("event", "page_view", {
+  gaSend("event", "page_view", {
     page_path: path,
     page_location: window.location.href,
     page_title: document.title,
