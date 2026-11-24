@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { siteConfig } from "../siteConfig";
 
 export const buyerShareImage = {
-  url: "/images/brand/lury-private-label-concept-v2.webp",
-  width: 1122,
-  height: 1402,
-  alt: "AI-generated Lury Beauty private-label lash packaging concept; not actual stock or a product photograph",
+  url: "/images/brand/lury-share-1200x630.webp",
+  width: 1200,
+  height: 630,
+  alt: "Lury Beauty private-label lash packaging concept with brand card, tray and applicator",
 };
 
 export function pageMetadata({ title, description, path, absoluteTitle = false }: {

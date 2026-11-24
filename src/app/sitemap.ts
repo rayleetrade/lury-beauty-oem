@@ -17,6 +17,7 @@ const routes = [
   "/sampling-and-quality",
   "/packaging-options",
   "/market-style-research",
+  "/collections",
   ...styleFamilies.map((family) => `/collections/${family.slug}`),
   ...productSlugs.map((slug) => `/products/${slug}`),
   "/sample-kit",
