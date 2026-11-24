@@ -23,9 +23,27 @@ export function readAttribution(): Attribution {
   } catch { /* The inquiry works even if browser storage is unavailable. */ }
   return current;
 }
-declare global { interface Window { dataLayer?: Record<string, unknown>[]; } }
+declare global {
+  interface Window {
+    dataLayer?: Record<string, unknown>[];
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
 export function leadEvent(event: string, parameters: Record<string, string> = {}) {
   if (typeof window === "undefined") return;
+  const payload = { page_path: window.location.pathname, ...parameters };
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event, page_path: window.location.pathname, ...parameters });
+  window.dataLayer.push({ event, ...payload });
+  // GA4 direct (used when NEXT_PUBLIC_GA4_ID is configured).
+  window.gtag?.("event", event, payload);
+}
+
+export function pageView(path: string) {
+  if (typeof window === "undefined") return;
+  window.gtag?.("event", "page_view", {
+    page_path: path,
+    page_location: window.location.href,
+    page_title: document.title,
+  });
 }

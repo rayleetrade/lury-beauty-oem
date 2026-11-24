@@ -1,11 +1,11 @@
 "use client";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { leadEvent, readAttribution } from "../lib/attribution";
+import { leadEvent, pageView, readAttribution } from "../lib/attribution";
 export function LeadSignals() {
   const pathname = usePathname();
   useEffect(() => {
-    readAttribution(); leadEvent("landing_view");
+    readAttribution(); pageView(pathname); leadEvent("landing_view");
     const onClick = (event: MouseEvent) => {
       const anchor = (event.target as Element)?.closest?.("a"); if (!anchor) return;
       const url = new URL(anchor.href, window.location.origin);
